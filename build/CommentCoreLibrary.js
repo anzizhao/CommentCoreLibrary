@@ -192,6 +192,7 @@ var CoreComment = (function () {
         this.text = "";
         this.ttl = 4000;
         this.dur = 4000;
+        this._timePassed = 0;   //某次间隔
         this.cindex = -1;
         this.motion = [];
         this.movable = true;
@@ -520,6 +521,7 @@ var CoreComment = (function () {
 
 
     CoreComment.prototype.time = function (time) {
+        this._timePassed = time 
         this.ttl -= time;
         if (this.ttl < 0) {
             this.ttl = 0;
@@ -603,7 +605,7 @@ var ScrollComment = (function (_super) {
     ScrollComment.prototype.init = function (recycle) {
         if (typeof recycle === "undefined") { recycle = null; }
         _super.prototype.init.call(this, recycle);
-        this.x = this.parent.width;
+        this.x = this.parent.width ;
         if (this.parent.options.scroll.opacity < 1) {
             this.alpha = this._alpha;
         }
@@ -611,8 +613,24 @@ var ScrollComment = (function (_super) {
     };
 
     ScrollComment.prototype.update = function () {
-        this.x = (this.ttl / this.dur) * (this.parent.width + this.width) - this.width;
+        //this.x = (this.ttl / this.dur) * (this.parent.width + this.width) - this.width;
+        // X = X - vt
+        var totalWidth = (this.parent.width + this.width ) * this.parent.options.scroll.speed
+        //var controlDur = this.dur * 
+        this.x  -=  (totalWidth / this.dur ) * this._timePassed  
     };
+
+    ScrollComment.prototype.speed = function ( speed ) {
+        this.parent.options.scroll.speed = speed 
+        //计算剩下时间扩大多少
+        //t = X / v
+        var totalWidth = (this.parent.width + this.width ) * this.parent.options.scroll.speed
+        //var v = totalWidth / this.dur  
+        //this.ttl = this.x /  v  
+        //equal to above
+        this.ttl = (this.x + this.width)  * this.dur / totalWidth 
+    };
+
     return ScrollComment;
 })(CoreComment);
 
@@ -705,7 +723,8 @@ var CommentManager = (function() {
 			},
 			scroll:{
 				opacity:1,
-				scale:1
+				scale:1,
+                speed:1,  // 动态修改速度
 			},
 			limit: 0
 		};
@@ -851,9 +870,13 @@ var CommentManager = (function() {
 			}
 		}
 	};
-	CommentManager.prototype.rescale = function(){
-		
+    //add anzizhao
+	CommentManager.prototype.speed = function(speed){
+        this.runline.forEach(function(item){
+            item.speed(speed) 
+        })	
 	};
+
 	CommentManager.prototype.send = function(data){
 		if(data.mode === 8){
 			console.log(data);
@@ -924,6 +947,7 @@ var CommentManager = (function() {
 			case 7:break;
 		}
 	};
+    
 	CommentManager.prototype.addEventListener = function(event, listener){
 		if(typeof this._listeners[event] !== "undefined"){
 			this._listeners[event].push(listener);
@@ -942,6 +966,7 @@ var CommentManager = (function() {
 			}
 		}
 	};
+
 	/** Static Functions **/
 	CommentManager.prototype.onTimerEvent = function(timePassed,cmObj){
 		for(var i= 0;i < cmObj.runline.length; i++){
