@@ -178,6 +178,35 @@ var AnchorCommentSpaceAllocator = (function (_super) {
     return AnchorCommentSpaceAllocator;
 })(CommentSpaceAllocator);
 
+var TodoCommentSpaceAllocator = (function (_super) {
+    __extends(TodoCommentSpaceAllocator, _super);
+    function TodoCommentSpaceAllocator() {
+        _super.apply(this, arguments);
+    }
+    TodoCommentSpaceAllocator.prototype.add = function (comment) {
+        var y = comment.y
+        _super.prototype.add.call(this, comment);
+        comment.y =  y 
+    };
+
+    //TodoCommentSpaceAllocator.prototype.willCollide = function (a, b) {
+        //return true;
+    //};
+
+    //TodoCommentSpaceAllocator.prototype.pathCheck = function (y, comment, pool) {
+        //var bottom = y + comment.height;
+        //for (var i = 0; i < pool.length; i++) {
+            //if (pool[i].y > bottom || pool[i].bottom < y) {
+                //continue;
+            //} else {
+                //return false;
+            //}
+        //}
+        //return true;
+    //};
+    return TodoCommentSpaceAllocator;
+})(CommentSpaceAllocator);
+
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -270,7 +299,6 @@ var CoreComment = (function () {
         }
         if (init.hasOwnProperty("y")) {
             this._y = init["y"];
-            console.log('init y: ', this._y )
         }
         if (init.hasOwnProperty("shadow")) {
             this._shadow = init["shadow"];
@@ -370,7 +398,6 @@ var CoreComment = (function () {
             }
             if (this.align < 2) {
                 this.dom.style.top = this._y + "px";
-                console.log('count top y: ', this._y )
             } else {
                 this.dom.style.bottom = this._y + "px";
             }
@@ -621,7 +648,8 @@ var ScrollComment = (function (_super) {
     ScrollComment.prototype.update = function () {
         //this.x = (this.ttl / this.dur) * (this.parent.width + this.width) - this.width;
         // X = X - vt
-        var totalWidth = (this.parent.width + this.width ) * this.parent.options.scroll.speed
+        //var totalWidth = (this.parent.width + this.width ) * this.parent.options.scroll.speed
+        var totalWidth = 2 * (this.parent.width ) * this.parent.options.scroll.speed
         //var controlDur = this.dur * 
         this.x  -=  (totalWidth / this.dur ) * this._timePassed  
     };
@@ -740,6 +768,7 @@ var CommentManager = (function() {
 		this.limiter = 0;
 		this.filter = null;
 		this.csa = {
+            todo : new TodoCommentSpaceAllocator (0,0),
 			scroll: new CommentSpaceAllocator(0,0),
 			top:new AnchorCommentSpaceAllocator(0,0),
 			bottom:new AnchorCommentSpaceAllocator(0,0),
@@ -886,9 +915,9 @@ var CommentManager = (function() {
 
 	CommentManager.prototype.send = function(data){
 		if(data.mode === 8){
-			console.log(data);
+			//console.log(data);
 			if(this.scripting){
-				console.log(this.scripting.eval(data.code));
+				//console.log(this.scripting.eval(data.code));
 			}
 			return;
 		}
@@ -912,7 +941,15 @@ var CommentManager = (function() {
 		this.stage.appendChild(cmt.dom);
 		switch(cmt.mode){
 			default:
-			case 1:{this.csa.scroll.add(cmt);}break;
+            case 1:
+                {
+                    if( data.todo ) {
+                        this.csa.todo.add(cmt);
+                    } else {
+                        this.csa.scroll.add(cmt);
+                    }
+                }
+                break;
 			case 2:{this.csa.scrollbtm.add(cmt);}break;
 			case 4:{this.csa.bottom.add(cmt);}break;
 			case 5:{this.csa.top.add(cmt);}break;
