@@ -1,7 +1,7 @@
 .abp{
   position:relative;
 }
-.abp .container{
+.abp .danmu-container{
   -webkit-transform: matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
           transform: matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
   position: absolute;
@@ -20,7 +20,7 @@
       -ms-user-select: none;
           user-select: none;
 }
-.abp .container .cmt{
+.abp .danmu-container .cmt{
   -webkit-transform: matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
           transform: matrix3d(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
   -webkit-transform-origin: 0% 0%;
@@ -43,10 +43,10 @@
   white-space: pre;
 
 }
-.abp .container .cmt.noshadow{
+.abp .danmu-container .cmt.noshadow{
   text-shadow: none;
 }
-.abp .container .cmt.rshadow{
+.abp .danmu-container .cmt.rshadow{
   text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
 

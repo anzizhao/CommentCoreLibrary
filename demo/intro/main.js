@@ -41,6 +41,7 @@ window.addEventListener('load', function(){
 				"stime": baseTime + 500*i,
 				"size": baseSize + 2*i,
 				"color":0x0,
+
                 'dur': 10000
             } 
             danmakuTimeline.push( item )

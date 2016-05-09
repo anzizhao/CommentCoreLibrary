@@ -270,6 +270,7 @@ var CoreComment = (function () {
         }
         if (init.hasOwnProperty("y")) {
             this._y = init["y"];
+            console.log('init y: ', this._y )
         }
         if (init.hasOwnProperty("shadow")) {
             this._shadow = init["shadow"];
@@ -369,6 +370,7 @@ var CoreComment = (function () {
             }
             if (this.align < 2) {
                 this.dom.style.top = this._y + "px";
+                console.log('count top y: ', this._y )
             } else {
                 this.dom.style.bottom = this._y + "px";
             }
@@ -590,8 +592,12 @@ var ScrollComment = (function (_super) {
     __extends(ScrollComment, _super);
     function ScrollComment(parent, data) {
         _super.call(this, parent, data);
-        this.dur *= this.parent.options.scroll.scale;
-        this.ttl *= this.parent.options.scroll.scale;
+        //this.dur *= this.parent.options.scroll.scale;
+        //this.ttl *= this.parent.options.scroll.scale;
+
+        // speed 为可以动态运行时候  改变速度  与花费时间反比
+        this.dur /=  this.parent.options.scroll.speed;
+        this.ttl /= this.parent.options.scroll.speed;
     }
     Object.defineProperty(ScrollComment.prototype, "alpha", {
         set: function (a) {
@@ -621,7 +627,7 @@ var ScrollComment = (function (_super) {
     };
 
     ScrollComment.prototype.speed = function ( speed ) {
-        this.parent.options.scroll.speed = speed 
+        //this.parent.options.scroll.speed = speed 
         //计算剩下时间扩大多少
         //t = X / v
         var totalWidth = (this.parent.width + this.width ) * this.parent.options.scroll.speed
@@ -872,6 +878,7 @@ var CommentManager = (function() {
 	};
     //add anzizhao
 	CommentManager.prototype.speed = function(speed){
+        this.options.scroll.speed = speed 
         this.runline.forEach(function(item){
             item.speed(speed) 
         })	
@@ -1243,4 +1250,10 @@ function BilibiliParser(xmlDoc, text, warn){
 		}
 	}
 	return tlist;
+}
+
+//export CommentManager;
+
+module.exports = {
+    CommentManager
 }
